@@ -13,7 +13,7 @@ namespace HookesLaw
             mass = 1;
             acceleration = Vector3.zero;
             velocity = Vector3.zero;
-            position = pos;
+            position = Vector3.zero;
         }
 
         public Vector3 position;
