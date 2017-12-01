@@ -13,7 +13,7 @@ namespace HookesLaw
             mass = 1;
             acceleration = Vector3.zero;
             velocity = Vector3.zero;
-            position = Vector3.zero;
+            position = pos;
         }
 
         public Vector3 position;
@@ -28,12 +28,12 @@ namespace HookesLaw
             force += f;
         }
 
-        public Vector3 Update(float deltaTime)
+        public void Update(float deltaTime)
         {
             acceleration = force / mass;
             velocity += acceleration * deltaTime;
             position += velocity * deltaTime;
-            return position;
+            force = Vector3.zero;
         }
     }
 
