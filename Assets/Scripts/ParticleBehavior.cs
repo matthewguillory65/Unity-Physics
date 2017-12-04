@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ParticleBehavior : MonoBehaviour {
+public class ParticleBehavior : MonoBehaviour
+    {
     [SerializeField]
     public GameObject firstSphere;
     public GameObject secondSphere;
@@ -20,7 +21,7 @@ public class ParticleBehavior : MonoBehaviour {
         part1 = new HookesLaw.Particle(firstSphere.transform.position);
         part2 = new HookesLaw.Particle(secondSphere.transform.position);
         dampener = new HookesLaw.SpringDamper(part1, part2, 10f, 5);
-	}
+    }
 	
 	// Update is called once per frame
 	void FixedUpdate ()
