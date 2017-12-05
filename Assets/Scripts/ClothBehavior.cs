@@ -56,22 +56,39 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
 
         for(int i = 0; i < rows * cols; i++)
         {
+            bool greaterZero = i > 0;
+            bool lessThanRightSideColumn = i % cols < cols - 1;
+            bool leftSideColumn = i % cols == 0;
+            bool lessthanbottomRow = i < (cols * rows) - cols;
             //Horizontal Connections
-            if (i / cols != cols - 1)
+            if (lessThanRightSideColumn)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[i * rows], particles[(rows - 1) + (i * rows)], 10f, 5));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + 1], 10f, 5));
             }
 
-            //Vertical Connections
-            if (i < (cols * rows) - cols)
+            ////Vertical Connections
+            if (lessthanbottomRow)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[(cols - 1) + (i * cols)], particles[i * cols], 10f, 5));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + (rows)], 10f, 5));
             }
 
-            //Left-right Diag connections
-
+            //Left - right Diag connections
+            if (lessthanbottomRow && lessThanRightSideColumn)
+            {
+                int bottom = i + cols;
+                int right = i + 1;
+                 
+                dampener.Add(new HookesLaw.SpringDamper(particles[right], particles[bottom], 10f, 5));
+            }
 
             //Right-left Diag connections
+            if (lessthanbottomRow && lessThanRightSideColumn /*&& !rightSideColumn*/)
+            {
+                int bottom = i + cols;
+                int bottomRight = bottom + 1;
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[bottomRight], 10f, 5));
+
+            }
 
             ///Horizontal Bending
             ///Vertical Bending
