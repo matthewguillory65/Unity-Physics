@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
+ #if UNITY_EDITOR
+    using UnityEditor;
+#endif
 public class ClothBehavior : MonoBehaviour, IDragHandler
 {
-
+    //public Collider coll;
     public List<GameObject> Spheres = new List<GameObject>();
     public List<HookesLaw.Particle> particles;
     public List<HookesLaw.SpringDamper> dampener;
@@ -28,6 +30,7 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
     void Start()
     {
         Objects = new List<GameObject>();
+        dampener = new List<HookesLaw.SpringDamper>();
 
         for (int i = 0; i < rows; i++)
         {
@@ -46,30 +49,48 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
         }
         Spheres.Sort();
 
-        
+
+        //coll = GetComponent<Collider>();
+        //coll.isTrigger = true;
 
 
-
-
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
+        for(int i = 0; i < rows * cols; i++)
+        {
+            //Horizontal Connections
+            if (i / cols != cols - 1)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[i + (j * rows)], particles[j + 1 + (i * cols)], 10f, 5));
-                dampener.Add(new HookesLaw.SpringDamper(particles[i * cols], particles[ 1 + (j * rows)], 10f, 5));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i * rows], particles[(rows - 1) + (i * rows)], 10f, 5));
             }
+
+            //Vertical Connections
+            if (i < (cols * rows) - cols)
+            {
+                dampener.Add(new HookesLaw.SpringDamper(particles[(cols - 1) + (i * cols)], particles[i * cols], 10f, 5));
+            }
+
+            //Left-right Diag connections
+
+
+            //Right-left Diag connections
+
+            ///Horizontal Bending
+            ///Vertical Bending
+        }
+        //for (int i = 0; i < rows; i++)
+        //    for (int j = 0; j < cols; j++)
+        //    {
+        //        dampener.Add(new HookesLaw.SpringDamper(particles[i + (j * cols)], particles[j + 1 + (i * rows)], 10f, 5));
+        //        dampener.Add(new HookesLaw.SpringDamper(particles[i * rows], particles[ 1 + (j * cols)], 10f, 5));
+        //    }
     }
 
     // Update is called once per frame
     void Update()
-    {
-        foreach (var i in dampener)
-        {
-            Debug.DrawLine(i._p1.position, i._p2.position, Color.white);
-        }
+    {        
         foreach (var j in particles)
         {
-            j.AddForce(new Vector3(0, -9.8f, 0));
-            j.Update(Time.deltaTime);
+            //j.AddForce(new Vector3(0, -9.8f, 0));
+            //j.Update(Time.deltaTime);
         }
         for(int w = 0; w < 16; w++)
         {
@@ -82,5 +103,22 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
         throw new System.NotImplementedException();
     }
 
-    
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    if (other.attachedRigidbody)
+    //    {
+    //        other.attachedRigidbody.useGravity = false;
+    //    }
+    //}
+
+#if UNITY_EDITOR
+    void OnDrawGizmos()
+    {        
+        if (dampener != null)
+        foreach(var damp in dampener)
+        {
+            Gizmos.DrawLine(damp._p1.position, damp._p2.position);
+        }
+    }
+#endif
 }
