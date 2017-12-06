@@ -57,8 +57,8 @@ namespace HookesLaw
 
         public void BacktoNormal()
         {
-            float distance = Vector3.Magnitude(_p1.position - _p2.position);
-            Vector3 normalDir = Vector3.Normalize(_p1.position - _p2.position);
+            float distance = Vector3.Magnitude(_p2.position - _p1.position);
+            Vector3 normalDir = Vector3.Normalize(_p2.position - _p1.position);
 
             Vector3 _e = _p2.position - _p1.position;
             float _l = _e.magnitude;

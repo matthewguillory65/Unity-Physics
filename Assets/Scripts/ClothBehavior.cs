@@ -8,7 +8,6 @@ using UnityEngine.UI;
 #endif
 public class ClothBehavior : MonoBehaviour, IDragHandler
 {
-    //public Collider coll;
     public List<GameObject> Spheres = new List<GameObject>();
     public List<HookesLaw.Particle> particles;
     public List<HookesLaw.SpringDamper> dampener;
@@ -16,8 +15,8 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
     int rows = 4;
     int cols = 4;
     float spacing = 1;
-    public float restPosition;
-    public int constant;
+    public float restPosition = 1.5f;
+    public int constant = 3;
     public int dampening;
     public GameObject part;
     HookesLaw.Particle part2;
@@ -49,9 +48,11 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
         }
         Spheres.Sort();
 
+        //foreach(var i in particles)
+        //{
+        //    i.AddForce(new Vector3(-40, 0, 0));
+        //}
 
-        //coll = GetComponent<Collider>();
-        //coll.isTrigger = true;
 
 
         for(int i = 0; i < rows * cols; i++)
@@ -63,13 +64,13 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
             //Horizontal Connections
             if (lessThanRightSideColumn)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + 1], 10f, 5));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + 1], 10f, restPosition));
             }
 
             ////Vertical Connections
             if (lessthanbottomRow)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + (rows)], 10f, 5));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + (rows)], 10f, restPosition));
             }
 
             //Left - right Diag connections
@@ -77,8 +78,7 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
             {
                 int bottom = i + cols;
                 int right = i + 1;
-                 
-                dampener.Add(new HookesLaw.SpringDamper(particles[right], particles[bottom], 10f, 5));
+                dampener.Add(new HookesLaw.SpringDamper(particles[right], particles[bottom], 10f, restPosition));
             }
 
             //Right-left Diag connections
@@ -86,9 +86,14 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
             {
                 int bottom = i + cols;
                 int bottomRight = bottom + 1;
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[bottomRight], 10f, 5));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[bottomRight], 10f, restPosition));
 
             }
+            
+
+            
+
+
 
             ///Horizontal Bending
             ///Vertical Bending
@@ -106,12 +111,26 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
     {        
         foreach (var j in particles)
         {
-            //j.AddForce(new Vector3(0, -9.8f, 0));
-            //j.Update(Time.deltaTime);
+            j.AddForce(new Vector3(0, -9.8f, 0));
+            j.Update(Time.deltaTime);
         }
         for(int w = 0; w < 16; w++)
         {
             Objects[w].transform.position = particles[w].position;
+
+            if (w == 0)
+            {
+                particles[0].AddForce(new Vector3(0, 9.81f, 0));
+            }
+
+            if (w == 3)
+            {
+                particles[3].AddForce(new Vector3(0, 9.81f, 0));
+            }
+        }
+        foreach (var i in dampener)
+        {
+            i.BacktoNormal();
         }
     }
 
@@ -120,13 +139,13 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
         throw new System.NotImplementedException();
     }
 
-    //private void OnTriggerEnter(Collider other)
-    //{
-    //    if (other.attachedRigidbody)
-    //    {
-    //        other.attachedRigidbody.useGravity = false;
-    //    }
-    //}
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.attachedRigidbody)
+        {
+            other.attachedRigidbody.useGravity = false;
+        }
+    }
 
 #if UNITY_EDITOR
     void OnDrawGizmos()
