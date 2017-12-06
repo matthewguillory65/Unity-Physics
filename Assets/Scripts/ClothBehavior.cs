@@ -16,8 +16,8 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
     int cols = 4;
     float spacing = 1;
     public float restPosition = 1.5f;
-    public int constant = 3;
-    public int dampening;
+    public int constant = 200;
+    public int dampening = 100;
     public GameObject part;
     HookesLaw.Particle part2;
 
@@ -64,13 +64,13 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
             //Horizontal Connections
             if (lessThanRightSideColumn)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + 1], 10f, restPosition));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + 1], constant, restPosition));
             }
 
             ////Vertical Connections
             if (lessthanbottomRow)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + (rows)], 10f, restPosition));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + (rows)], constant, restPosition));
             }
 
             //Left - right Diag connections
@@ -78,7 +78,7 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
             {
                 int bottom = i + cols;
                 int right = i + 1;
-                dampener.Add(new HookesLaw.SpringDamper(particles[right], particles[bottom], 10f, restPosition));
+                dampener.Add(new HookesLaw.SpringDamper(particles[right], particles[bottom], constant, restPosition));
             }
 
             //Right-left Diag connections
@@ -86,7 +86,7 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
             {
                 int bottom = i + cols;
                 int bottomRight = bottom + 1;
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[bottomRight], 10f, restPosition));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[bottomRight], constant, restPosition));
 
             }
             
@@ -111,7 +111,9 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
     {        
         foreach (var j in particles)
         {
-            j.AddForce(new Vector3(0, -9.8f, 0));
+            
+            if (j != particles[0] && j != particles[cols - 1])
+                j.AddForce(new Vector3(0, -9.8f, 0));
             j.Update(Time.deltaTime);
         }
         for(int w = 0; w < 16; w++)
@@ -120,12 +122,12 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
 
             if (w == 0)
             {
-                particles[0].AddForce(new Vector3(0, 9.81f, 0));
+                particles[0].AddForce(new Vector3(0, 0, 0));
             }
 
-            if (w == 3)
+            if (w == cols - 1)
             {
-                particles[3].AddForce(new Vector3(0, 9.81f, 0));
+                particles[cols - 1].AddForce(new Vector3(0, 0, 0));
             }
         }
         foreach (var i in dampener)

@@ -66,18 +66,17 @@ namespace HookesLaw
 
             Vector3 fix = normalDir * (_Lo - distance) * _Ks;
 
-            float _v1 = Vector3.Dot(_E, _p1.velocity);
-            float _v2 = Vector3.Dot(_E, _p2.velocity);
-
             _p1.AddForce(fix);
             _p2.AddForce(-fix);
 
-            float Fsd = (-_Ks * (_Lo - _l)) - (_Kd * (_v1 - _v2));
-            Vector3 _f1 = Fsd * _E;
-            Vector3 _f2 = -_f1;
+            float _v1 = Vector3.Dot(_E, _p1.velocity);
+            float _v2 = Vector3.Dot(_E, _p2.velocity);
+
+            float Fsd = (-_Ks * (_Lo - _l)) - (_Kd * (_v2 - _v1));
+            Vector3 _f1 = _E * Fsd;
 
             _p1.AddForce(_f1);
-            _p2.AddForce(_f2);
+            _p2.AddForce(-_f1);
         }
     }
 
