@@ -6,7 +6,7 @@ using UnityEngine.UI;
  #if UNITY_EDITOR
     using UnityEditor;
 #endif
-public class ClothBehavior : MonoBehaviour, IDragHandler
+public class ClothBehavior : MonoBehaviour
 {
     public List<GameObject> Spheres = new List<GameObject>();
     public List<HookesLaw.Particle> particles;
@@ -15,12 +15,11 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
     int rows = 4;
     int cols = 4;
     float spacing = 1;
-    public float restPosition = 1.5f;
-    public int constant = 200;
-    public int dampening = 100;
+    public float restPosition = .65f;
+    public float constant = 10;
+    public float dampening = 3;
     public GameObject part;
     HookesLaw.Particle part2;
-
     List<GameObject> Objects;
 
 
@@ -35,8 +34,8 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
         {
             for (int j = 0; j < cols; j++)
             {
-                var y = -i * rows * restPosition;
-                var z = -j * cols * restPosition;
+                var y = -i * restPosition;
+                var z = -j * restPosition;
                 part = Instantiate(Object);
                 part.transform.position = new Vector3(0, y, z);
                 Objects.Add(part);
@@ -47,15 +46,8 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
             }
         }
         Spheres.Sort();
-
-        //foreach(var i in particles)
-        //{
-        //    i.AddForce(new Vector3(-40, 0, 0));
-        //}
-
-
-
-        for(int i = 0; i < rows * cols; i++)
+        
+        for (int i = 0; i < rows * cols; i++)
         {
             bool greaterZero = i > 0;
             bool lessThanRightSideColumn = i % cols < cols - 1;
@@ -64,56 +56,36 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
             //Horizontal Connections
             if (lessThanRightSideColumn)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + 1], constant, restPosition));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + 1], constant, dampening, restPosition));
             }
-
             ////Vertical Connections
             if (lessthanbottomRow)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + (rows)], constant, restPosition));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + (rows)], constant, dampening, restPosition));
             }
-
             //Left - right Diag connections
             if (lessthanbottomRow && lessThanRightSideColumn)
             {
                 int bottom = i + cols;
                 int right = i + 1;
-                dampener.Add(new HookesLaw.SpringDamper(particles[right], particles[bottom], constant, restPosition));
+                dampener.Add(new HookesLaw.SpringDamper(particles[right], particles[bottom], constant, dampening, restPosition * 1.41f));
             }
-
             //Right-left Diag connections
-            if (lessthanbottomRow && lessThanRightSideColumn /*&& !rightSideColumn*/)
+            if (lessthanbottomRow && lessThanRightSideColumn)
             {
                 int bottom = i + cols;
                 int bottomRight = bottom + 1;
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[bottomRight], constant, restPosition));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[bottomRight], constant, dampening, restPosition * 1.41f));
 
             }
-            
-
-            
-
-
-
-            ///Horizontal Bending
-            ///Vertical Bending
         }
-        //for (int i = 0; i < rows; i++)
-        //    for (int j = 0; j < cols; j++)
-        //    {
-        //        dampener.Add(new HookesLaw.SpringDamper(particles[i + (j * cols)], particles[j + 1 + (i * rows)], 10f, 5));
-        //        dampener.Add(new HookesLaw.SpringDamper(particles[i * rows], particles[ 1 + (j * cols)], 10f, 5));
-        //    }
     }
 
     // Update is called once per frame
     void Update()
-    {        
+    {
         foreach (var j in particles)
         {
-            
-            if (j != particles[0] && j != particles[cols - 1])
-                j.AddForce(new Vector3(0, -9.8f, 0));
             j.Update(Time.deltaTime);
         }
         for(int w = 0; w < 16; w++)
@@ -122,23 +94,21 @@ public class ClothBehavior : MonoBehaviour, IDragHandler
 
             if (w == 0)
             {
-                particles[0].AddForce(new Vector3(0, 0, 0));
+                particles[0].useGravity = false;
+                particles[0].locked = true;
+                particles[0].velocity = Vector3.zero;
             }
-
             if (w == cols - 1)
             {
-                particles[cols - 1].AddForce(new Vector3(0, 0, 0));
+                particles[w].useGravity = false;
+                particles[w].locked = true;
+                particles[w].velocity = Vector3.zero;
             }
         }
         foreach (var i in dampener)
         {
             i.BacktoNormal();
         }
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        throw new System.NotImplementedException();
     }
 
     private void OnTriggerEnter(Collider other)

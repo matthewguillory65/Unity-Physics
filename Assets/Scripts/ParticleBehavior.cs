@@ -20,7 +20,7 @@ public class ParticleBehavior : MonoBehaviour
 
         part1 = new HookesLaw.Particle(firstSphere.transform.position);
         part2 = new HookesLaw.Particle(secondSphere.transform.position);
-        dampener = new HookesLaw.SpringDamper(part1, part2, 10f, 5);
+        dampener = new HookesLaw.SpringDamper(part1, part2, 1, 1, 1);
     }
 	
 	// Update is called once per frame

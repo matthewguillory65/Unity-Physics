@@ -9,6 +9,8 @@ namespace HookesLaw
     {
         public Particle(Vector3 pos)
         {
+            useGravity = true;
+            locked = false;
             force = Vector3.zero;
             mass = 1;
             acceleration = Vector3.zero;
@@ -22,6 +24,8 @@ namespace HookesLaw
         //not weight
         float mass;//must be at least 1
         Vector3 force;
+        public bool useGravity;
+        public bool locked;
 
         public void AddForce(Vector3 f)
         {
@@ -30,53 +34,57 @@ namespace HookesLaw
 
         public void Update(float deltaTime)
         {
-            acceleration = force / mass;
-            velocity += acceleration * deltaTime;
-            position += velocity * deltaTime;
-            force = Vector3.zero;
+            if(useGravity)
+            {
+                force += new Vector3(0, -9.81f, 0);
+            }
+            if(!locked)
+            {
+                acceleration = force / mass;
+                velocity += acceleration * deltaTime;
+                position += velocity * deltaTime;
+                force = Vector3.zero;
+            }
         }
     }
 
     public class SpringDamper
     {
-        public Particle _p1, _p2;
+        public Particle _p1, _p2, particles;
         float _Ks;//Spring Constant
         float _Lo;//Rest Length
-        float _Kd;
+        float _Kd;//Spring Damp
 
         public SpringDamper()
         { }
 
-        public SpringDamper(Particle p1, Particle p2, float springConstant, float restLength)
+        public SpringDamper(Particle p1, Particle p2, float springConstant, float springDamp, float restLength)
         {
             _p1 = p1;
             _p2 = p2;
             _Ks = springConstant;
             _Lo = restLength;
+            _Kd = springConstant;
         }
 
         public void BacktoNormal()
         {
-            float distance = Vector3.Magnitude(_p2.position - _p1.position);
-            Vector3 normalDir = Vector3.Normalize(_p2.position - _p1.position);
-
-            Vector3 _e = _p2.position - _p1.position;
-            float _l = _e.magnitude;
-            Vector3 _E = _e / _l;
-
-            Vector3 fix = normalDir * (_Lo - distance) * _Ks;
-
-            _p1.AddForce(fix);
-            _p2.AddForce(-fix);
+            Vector3 estar = _p2.position - _p1.position;
+            float _l = estar.magnitude;
+            Vector3 _E = estar / _l;
 
             float _v1 = Vector3.Dot(_E, _p1.velocity);
             float _v2 = Vector3.Dot(_E, _p2.velocity);
 
-            float Fsd = (-_Ks * (_Lo - _l)) - (_Kd * (_v2 - _v1));
-            Vector3 _f1 = _E * Fsd;
+            float Fsd = (-_Ks * (_Lo - _l)) - (_Kd * (_v1 - _v2));
 
+            Vector3 _f1 = Fsd * _E;
+            Vector3 _f2 = -_f1;
+            
             _p1.AddForce(_f1);
-            _p2.AddForce(-_f1);
+            _p2.AddForce(_f2);
+
+            
         }
     }
 
