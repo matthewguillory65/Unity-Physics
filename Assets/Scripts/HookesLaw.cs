@@ -88,4 +88,10 @@ namespace HookesLaw
         }
     }
 
+    public class Wind
+    {
+
+    }
+
+
 }
