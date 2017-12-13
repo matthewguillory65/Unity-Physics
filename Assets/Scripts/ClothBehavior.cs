@@ -12,8 +12,8 @@ public class ClothBehavior : MonoBehaviour
     public List<HookesLaw.Particle> particles;
     public List<HookesLaw.SpringDamper> dampener;
     public GameObject Object;
-    int rows = 4;
-    int cols = 4;
+    int rows = 6;
+    int cols = 6;
     float spacing = 1;
     public float restPosition = .65f;
     public float constant = 10;
@@ -61,14 +61,14 @@ public class ClothBehavior : MonoBehaviour
             ////Vertical Connections
             if (lessthanbottomRow)
             {
-                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + (rows)], constant, dampening, restPosition));
+                dampener.Add(new HookesLaw.SpringDamper(particles[i], particles[i + rows], constant, dampening, restPosition));
             }
             //Left - right Diag connections
             if (lessthanbottomRow && lessThanRightSideColumn)
             {
                 int bottom = i + cols;
                 int right = i + 1;
-                dampener.Add(new HookesLaw.SpringDamper(particles[right], particles[bottom], constant, dampening, restPosition * 1.41f));
+                dampener.Add(new HookesLaw.SpringDamper(particles[bottom], particles[right], constant, dampening, restPosition * 1.41f));
             }
             //Right-left Diag connections
             if (lessthanbottomRow && lessThanRightSideColumn)
